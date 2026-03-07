@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #7DBC91;
+    font-family: sans-serif; 
+    min-height: 100vh;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center;     
+    padding: 40px 20px;     
+}
+
+.logo {
+    max-width: 250px;        
+    height: auto;
+}
+
+.app-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 20px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 1.1rem;
+    color: #0B3310;
+}
+
+.grow-btn {
+    background-color: #0B3310;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.grow-btn:active {
+    transform: scale(0.95);
+}
+
+.hint-text {
+    display: block; 
+    color: #DFEFE4; 
+    font-size: 0.85rem;
+    margin-left: 25px;  
+    margin-top: 4px;    
+    font-style: italic;  
+}
+
+
+.input-item {
+    display: flex;
+    flex-direction: column;
+}
+
