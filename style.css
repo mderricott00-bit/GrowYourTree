@@ -1,3 +1,7 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -10,10 +14,11 @@ body {
     display: flex;
     justify-content: center; 
     align-items: center;     
-    padding: 40px 20px;     
+    padding: 16px 20px;     
 }
 
 .logo {
+    width: 100%;
     max-width: 250px;        
     height: auto;
 }
@@ -22,15 +27,19 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center; 
-    gap: 20px;
+    gap: 12px;
+    padding: 0 16px;
+    width: 100%;
 }
 
 .checkbox-group {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
     color: #0B3310;
+    width: 100%;
+    max-width: 400px;
 }
 
 .grow-btn {
@@ -62,5 +71,67 @@ body {
 .input-item {
     display: flex;
     flex-direction: column;
+}
+
+.video-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 0;
+    padding-bottom: 8px;
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+#tree-img,
+#tree-video {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 16px;
+    display: block;
+}
+
+#tree-video {
+    display: none;
+}
+
+.progress-section {
+    width: 100%;
+    max-width: 400px;
+    padding: 0 16px 16px;
+}
+
+.progress-bar {
+    display: flex;
+    gap: 6px;
+    height: 14px;
+}
+
+.progress-segment {
+    flex: 1;
+    background-color: #DFEFE4;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: #0B3310;
+    border-radius: 8px;
+    transition: width 0.5s ease;
+}
+
+.progress-labels {
+    display: flex;
+    margin-top: 6px;
+}
+
+.progress-labels span {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #0B3310;
+    font-weight: bold;
 }
 

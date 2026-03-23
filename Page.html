@@ -26,8 +26,101 @@
         <label><input type="checkbox"> Reduced waste</label>
     </div>
 
-    <button type="submit" class="grow-btn">Grow</button>
+    <button type="submit" class="grow-btn" id="grow-btn">Grow</button>
+
+    <section class="video-section">
+        <img id="tree-img" src="trees/Sprout.jpg" alt="Your tree">
+        <video id="tree-video" src=""></video>
+    </section>
+
+    <section class="progress-section">
+        <div class="progress-bar">
+            <div class="progress-segment"><div class="progress-fill" id="prog-0"></div></div>
+            <div class="progress-segment"><div class="progress-fill" id="prog-1"></div></div>
+            <div class="progress-segment"><div class="progress-fill" id="prog-2"></div></div>
+            <div class="progress-segment"><div class="progress-fill" id="prog-3"></div></div>
+        </div>
+        <div class="progress-labels">
+            <span>Seedling</span>
+            <span>Sapling</span>
+            <span>Adult</span>
+            <span>Complete</span>
+        </div>
+    </section>
 </main>
+
+<script>
+    const stages = [
+        { minPts: 0,  video: null,                        image: 'trees/Sprout.jpg' },
+        { minPts: 5,  video: 'trees/SproutToSeedling.mp4', image: 'trees/Seedling.jpg' },
+        { minPts: 10,  video: 'trees/SeedlingToSapling.mp4', image: 'trees/Sapling.jpg' },
+        { minPts: 15,  video: 'trees/SaplingToAdult.mp4',  image: 'trees/AdultTree.jpg' },
+        { minPts: 20, video: 'trees/AdultToSprout.mp4',   image: 'trees/Sprout.jpg' }
+    ];
+
+    function getStage(pts) {
+        let stage = stages[0];
+        for (const s of stages) {
+            if (pts >= s.minPts) stage = s;
+        }
+        return stage;
+    }
+
+    const img   = document.getElementById('tree-img');
+    const video = document.getElementById('tree-video');
+
+    function showImage(src) {
+        video.pause();
+        video.style.display = 'none';
+        img.src = src;
+        img.style.display = 'block';
+    }
+
+    function updateProgress(pts) {
+        for (let i = 0; i < 4; i++) {
+            const fill = Math.max(0, Math.min(1, (pts - i * 5) / 5));
+            document.getElementById('prog-' + i).style.width = (fill * 100) + '%';
+        }
+    }
+
+    // Restore saved state on load
+    const savedPts = parseInt(localStorage.getItem('treePoints') || '0', 10);
+    showImage(getStage(savedPts).image);
+    updateProgress(savedPts);
+
+    video.addEventListener('ended', function () {
+        const pts = parseInt(localStorage.getItem('treePoints') || '0', 10);
+        if (pts >= 20) {
+            localStorage.setItem('treePoints', '0');
+            updateProgress(0);
+        }
+        showImage(getStage(parseInt(localStorage.getItem('treePoints') || '0', 10)).image);
+    });
+
+    document.getElementById('grow-btn').addEventListener('click', function () {
+        const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+        let earned = 0;
+        checkboxes.forEach(cb => { if (cb.checked) earned++; });
+        checkboxes.forEach(cb => { cb.checked = false; });
+
+        const prev = parseInt(localStorage.getItem('treePoints') || '0', 10);
+        const total = prev + earned;
+        localStorage.setItem('treePoints', total);
+        updateProgress(total);
+
+        const prevStage = getStage(prev);
+        const stage = getStage(total);
+        if (stage.video && stage.minPts !== prevStage.minPts) {
+            img.style.display = 'none';
+            video.src = stage.video;
+            video.style.display = 'block';
+            video.load();
+            video.play();
+        } else {
+            showImage(stage.image);
+        }
+    });
+</script>
 
 </body>
 </html>
