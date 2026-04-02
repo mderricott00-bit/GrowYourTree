@@ -32,6 +32,18 @@ body {
     width: 100%;
 }
 
+.tree-counter {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #0B3310;
+    background-color: #DFEFE4;
+    padding: 10px 24px;
+    border-radius: 16px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
 .checkbox-group {
     display: flex;
     flex-direction: column;
@@ -133,5 +145,34 @@ body {
     font-size: 0.75rem;
     color: #0B3310;
     font-weight: bold;
+}
+
+.forest-section {
+    width: 100%;
+    max-width: 400px;
+    padding: 0 16px 24px;
+    display: none;
+}
+
+.forest-title {
+    font-size: 1rem;
+    color: #0B3310;
+    text-align: center;
+    margin: 0 0 8px;
+}
+
+.forest {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background-color: #7DBC91;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.forest-tree {
+    position: absolute;
+    border-radius: 6px;
+    object-fit: cover;
 }
 
