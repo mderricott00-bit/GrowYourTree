@@ -176,3 +176,13 @@ body {
     object-fit: cover;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    #tree-video {
+        display: none !important;
+    }
+    
+    #tree-img {
+        display: block !important;
+    }
+}
+

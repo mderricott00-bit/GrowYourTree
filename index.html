@@ -72,6 +72,11 @@
         return stage;
     }
 
+    // Check if user prefers reduced motion
+    function prefersReducedMotion() {
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
     const img   = document.getElementById('tree-img');
     const video = document.getElementById('tree-video');
 
@@ -167,7 +172,7 @@
 
         const prevStage = getStage(prev);
         const stage = getStage(total);
-        if (stage.video && stage.minPts !== prevStage.minPts) {
+        if (stage.video && stage.minPts !== prevStage.minPts && !prefersReducedMotion()) {
             img.style.display = 'none';
             video.src = stage.video;
             video.style.display = 'block';
