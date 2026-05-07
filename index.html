@@ -13,29 +13,37 @@
     </header>
 
 <main class="app-content">
-    <div class="tree-counter" id="tree-counter">🌳 Trees Grown: <span id="trees-grown">0</span></div>
-    <div class="checkbox-group">
-        <label><input type="checkbox"> Recycled</label>
-        <label><input type="checkbox"> Composted</label>
+    <p class="tree-counter" id="tree-counter">Trees Grown: <span id="trees-grown">0</span></p>
+    <p class="sr-only" id="app-status" role="status" aria-live="polite" aria-atomic="true"></p>
 
-        <div class="input-item">
-        <label><input type="checkbox"> Made a product reusable</label>
-        <span class="hint-text">Example: using old jars for storage</span>
-    </div>
-    
-        <label><input type="checkbox"> Used reusable product</label>
-        <label><input type="checkbox"> Reduced waste</label>
-    </div>
+    <form class="growth-form" id="growth-form">
+        <fieldset class="checkbox-group">
+            <legend class="group-legend">Which actions did you complete today?</legend>
+            <div></div>
+            <label><input type="checkbox" id="action-recycled"> Recycled</label>
+            <label><input type="checkbox" id="action-composted"> Composted</label>
 
-    <button type="submit" class="grow-btn" id="grow-btn">Grow</button>
+            <div class="input-item">
+                <label><input type="checkbox" id="action-reusable" aria-describedby="reusable-hint"> Made a product reusable</label>
+                <span class="hint-text" id="reusable-hint">Example: using old jars for storage</span>
+            </div>
 
-    <section class="video-section">
-        <img id="tree-img" src="trees/Sprout.jpg" alt="Your tree">
-        <video id="tree-video" src=""></video>
+            <label><input type="checkbox" id="action-used-reusable"> Used reusable product</label>
+            <label><input type="checkbox" id="action-reduced-waste"> Reduced waste</label>
+        </fieldset>
+
+        <button type="submit" class="grow-btn" id="grow-btn">Grow</button>
+    </form>
+<div></div>
+    <section class="video-section" aria-labelledby="stage-text">
+        <p class="stage-text" id="stage-text">Current stage: Sprout</p>
+        <img id="tree-img" src="trees/Sprout.jpg" alt="Sprout stage tree">
+        <video id="tree-video" src="" aria-hidden="true" muted playsinline preload="metadata"></video>
     </section>
 
-    <section class="progress-section">
-        <div class="progress-bar">
+    <section class="progress-section" aria-labelledby="progress-heading">
+        <h2 class="sr-only" id="progress-heading">Tree growth progress</h2>
+        <div class="progress-bar" id="progress-bar" role="progressbar" aria-label="Tree growth progress" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0" aria-valuetext="Sprout stage, 0 of 20 points">
             <div class="progress-segment"><div class="progress-fill" id="prog-0"></div></div>
             <div class="progress-segment"><div class="progress-fill" id="prog-1"></div></div>
             <div class="progress-segment"><div class="progress-fill" id="prog-2"></div></div>
@@ -49,7 +57,7 @@
         </div>
     </section>
 
-    <section class="forest-section" id="forest-section">
+    <section class="forest-section" id="forest-section" hidden>
         <h2 class="forest-title">Your Forest</h2>
         <div class="forest" id="forest"></div>
     </section>
@@ -57,11 +65,11 @@
 
 <script>
     const stages = [
-        { minPts: 0,  video: null,                        image: 'trees/Sprout.jpg' },
-        { minPts: 5,  video: 'trees/SproutToSeedling.mp4', image: 'trees/Seedling.jpg' },
-        { minPts: 10,  video: 'trees/SeedlingToSapling.mp4', image: 'trees/Sapling.jpg' },
-        { minPts: 15,  video: 'trees/SaplingToAdult.mp4',  image: 'trees/AdultTree.jpg' },
-        { minPts: 20, video: 'trees/AdultToSprout.mp4',   image: 'trees/Sprout.jpg' }
+        { minPts: 0, video: null, image: 'trees/Sprout.jpg', label: 'Sprout' },
+        { minPts: 5, video: 'trees/SproutToSeedling.mp4', image: 'trees/Seedling.jpg', label: 'Seedling' },
+        { minPts: 10, video: 'trees/SeedlingToSapling.mp4', image: 'trees/Sapling.jpg', label: 'Sapling' },
+        { minPts: 15, video: 'trees/SaplingToAdult.mp4', image: 'trees/AdultTree.jpg', label: 'Adult' },
+        { minPts: 20, video: 'trees/AdultToSprout.mp4', image: 'trees/Sprout.jpg', label: 'Complete' }
     ];
 
     function getStage(pts) {
@@ -79,24 +87,46 @@
 
     const img   = document.getElementById('tree-img');
     const video = document.getElementById('tree-video');
+    const stageText = document.getElementById('stage-text');
+    const progressBar = document.getElementById('progress-bar');
+    const statusMessage = document.getElementById('app-status');
+    const growthForm = document.getElementById('growth-form');
 
-    function showImage(src) {
+    function announceStatus(message) {
+        statusMessage.textContent = message;
+    }
+
+    function setStageText(label) {
+        stageText.textContent = 'Current stage: ' + label;
+    }
+
+    function showImage(stage) {
         video.pause();
+        video.currentTime = 0;
+        video.hidden = true;
         video.style.display = 'none';
-        img.src = src;
+        img.src = stage.image;
+        img.alt = stage.label + ' stage tree';
+        setStageText(stage.label);
+        img.hidden = false;
         img.style.display = 'block';
     }
 
     function updateProgress(pts) {
+        const clamped = Math.max(0, Math.min(20, pts));
         for (let i = 0; i < 4; i++) {
             const fill = Math.max(0, Math.min(1, (pts - i * 5) / 5));
             document.getElementById('prog-' + i).style.width = (fill * 100) + '%';
         }
+        const currentStage = getStage(clamped);
+        progressBar.setAttribute('aria-valuenow', String(clamped));
+        progressBar.setAttribute('aria-valuetext', currentStage.label + ' stage, ' + clamped + ' of 20 points');
     }
 
     function updateTreeCounter() {
-        document.getElementById('trees-grown').textContent =
-            localStorage.getItem('treesGrown') || '0';
+        const count = localStorage.getItem('treesGrown') || '0';
+        document.getElementById('trees-grown').textContent = count;
+        document.getElementById('tree-counter').setAttribute('aria-label', 'Trees grown: ' + count);
     }
 
     // Seeded pseudo-random number generator (mulberry32)
@@ -116,10 +146,10 @@
         container.innerHTML = '';
 
         if (count === 0) {
-            section.style.display = 'none';
+            section.hidden = true;
             return;
         }
-        section.style.display = 'block';
+        section.hidden = false;
 
         for (let i = 0; i < count; i++) {
             const rand = seededRandom(i * 9973 + 42);
@@ -130,7 +160,8 @@
             const tree = document.createElement('img');
             tree.src = 'trees/AdultTree.jpg';
             tree.className = 'forest-tree';
-            tree.alt = 'Grown tree ' + (i + 1);
+            tree.alt = '';
+            tree.setAttribute('aria-hidden', 'true');
             tree.style.width = size + 'px';
             tree.style.left = left + '%';
             tree.style.bottom = bottom + 'px';
@@ -139,9 +170,20 @@
         }
     }
 
+    function completeTreeGrowth() {
+        const grown = parseInt(localStorage.getItem('treesGrown') || '0', 10) + 1;
+        localStorage.setItem('treesGrown', String(grown));
+        localStorage.setItem('treePoints', '0');
+        updateProgress(0);
+        updateTreeCounter();
+        renderForest();
+        showImage(getStage(0));
+        announceStatus('Tree completed. Your forest now has ' + grown + ' trees.');
+    }
+
     // Restore saved state on load
     const savedPts = parseInt(localStorage.getItem('treePoints') || '0', 10);
-    showImage(getStage(savedPts).image);
+    showImage(getStage(savedPts));
     updateProgress(savedPts);
     updateTreeCounter();
     renderForest();
@@ -149,37 +191,58 @@
     video.addEventListener('ended', function () {
         const pts = parseInt(localStorage.getItem('treePoints') || '0', 10);
         if (pts >= 20) {
-            const grown = parseInt(localStorage.getItem('treesGrown') || '0', 10) + 1;
-            localStorage.setItem('treesGrown', grown);
-            localStorage.setItem('treePoints', '0');
-            updateProgress(0);
-            updateTreeCounter();
-            renderForest();
+            completeTreeGrowth();
+            return;
         }
-        showImage(getStage(parseInt(localStorage.getItem('treePoints') || '0', 10)).image);
+        const currentStage = getStage(pts);
+        showImage(currentStage);
+        announceStatus(currentStage.label + ' stage reached. ' + pts + ' of 20 points.');
     });
 
-    document.getElementById('grow-btn').addEventListener('click', function () {
+    growthForm.addEventListener('submit', function (event) {
+        event.preventDefault();
         const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
         let earned = 0;
         checkboxes.forEach(cb => { if (cb.checked) earned++; });
+
+        if (earned === 0) {
+            announceStatus('Select at least one eco action before growing your tree.');
+            return;
+        }
+
         checkboxes.forEach(cb => { cb.checked = false; });
 
         const prev = parseInt(localStorage.getItem('treePoints') || '0', 10);
         const total = prev + earned;
-        localStorage.setItem('treePoints', total);
+        localStorage.setItem('treePoints', String(total));
         updateProgress(total);
 
         const prevStage = getStage(prev);
         const stage = getStage(total);
         if (stage.video && stage.minPts !== prevStage.minPts && !prefersReducedMotion()) {
+            img.hidden = true;
             img.style.display = 'none';
             video.src = stage.video;
+            video.hidden = false;
             video.style.display = 'block';
             video.load();
-            video.play();
+            setStageText(stage.label);
+            announceStatus(earned + ' actions added. ' + stage.label + ' stage reached.');
+            video.play().catch(function () {
+                if (total >= 20) {
+                    completeTreeGrowth();
+                    return;
+                }
+                showImage(stage);
+                announceStatus(earned + ' actions added. ' + stage.label + ' stage reached. ' + total + ' of 20 points.');
+            });
         } else {
-            showImage(stage.image);
+            if (total >= 20) {
+                completeTreeGrowth();
+                return;
+            }
+            showImage(stage);
+            announceStatus(earned + ' actions added. ' + stage.label + ' stage reached. ' + total + ' of 20 points.');
         }
     });
 </script>
